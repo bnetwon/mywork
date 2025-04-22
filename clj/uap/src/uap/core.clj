@@ -1,7 +1,8 @@
 (ns uap.core
 (:require
-    [ss.loop :as ssa]
+    [ss.loop :as ssl]
     [clojure.core.async :as a]
+    [java-time.api :as jt]
     [swing-clip.clipboard])
   (:import [java.awt Toolkit]
            [java.io File]
@@ -60,11 +61,12 @@ if ls (reset! lastFile ls) @lastFile )))
 
 (def clipOwner (reify java.awt.datatransfer.ClipboardOwner
                  (^void  lostOwnership [this ^Clipboard c ^Transferable t]
-                  (do (Thread/sleep @clipsleep )
+                   (do (Thread/sleep @clipsleep)
                        (let [^Transferable contents (. c getContents this)]
-                        (do
-                         (@afn this contents c t)
-                         (. c setContents contents this)))))))
+                         (do
+                           (@afn this contents c t)
+                        ; (. c setContents contents this)
+                           ))))))
 ;
 (def nilOwner (reify java.awt.datatransfer.ClipboardOwner
                 (^void  lostOwnership [this ^Clipboard c ^Transferable t]
@@ -171,4 +173,19 @@ if ls (reset! lastFile ls) @lastFile )))
                               (recur (a/<!! @stringchan)))))
 ;;(use 'swing-clip.sqldb)
 ;(require 'inspector.core)
-;
+;(ssl/stop 42)
+(defn actfn [mapflg] (
+  if (:act mapflg) (do (prn "")) (Thread/sleep 1000)))
+
+(defn dynamic-record-conversion [target-record source-record]
+  (let [target-fields (keys target-record)
+        source-fields (keys source-record)
+        common-fields (filter #(some #{%} source-fields) target-fields)]
+    (reduce (fn [acc field]
+              (assoc acc field (get source-record field nil)))
+            (into {} (map (fn [field] [field nil]) target-fields))
+            common-fields)))
+
+
+
+

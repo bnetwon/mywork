@@ -33,6 +33,7 @@
                  [org.seleniumhq.selenium/selenium-edge-driver "4.9.1"]
                  [org.seleniumhq.selenium/htmlunit-driver "4.9.0"]
                  [org.seleniumhq.selenium/selenium-support "4.9.1"]
+                 [clojure.java-time "1.4.3"]
                  ;[org.seleniumhq.selenium/selenium-leg-rc "4.5.0"]
                  ;[org.webbitserver/webbit "0.4.15"]
                  ;[com.microsoft.sqlserver/mssql-jdbc "12.2.0.jre11"]
@@ -45,7 +46,8 @@
   :source-paths ["src" "dev"]
   :java-source-paths ["java_src"]
   :repl-options {:init-ns uap.core
-                 :nrepl-middleware [portal.nrepl/wrap-repl]}
+;                 :nrepl-middleware [portal.nrepl/wrap-repl]
+                 }
   :repl {:plugins [[cider/cider-nrepl "0.31.0"]
                    [refactor-nrepl "3.6.0"]
                    [lein-try "0.4.3"]]

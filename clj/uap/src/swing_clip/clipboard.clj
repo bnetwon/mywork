@@ -223,3 +223,13 @@
 ( map (fn [a] ( do (new String (byte-array a) "SJIS"))) (raw-multi-split-at spvec(.getBytes chvec "SJIS")))
   )
 (defn file2excel[](let [rg (re-matches #"(.*/)(.*?)$" (get-string)) dir (second rg) file (nth  rg 2) ] (set-string (str dir "\t" file ) ) ))
+
+(defn split-and-ensure-empty [s delimiter]
+  (let [split-str (clojure.string/split s delimiter -1)]
+    split-str))
+
+(defn split-and-pad [s delimiter length]
+  (let [split-str (clojure.string/split s delimiter)]
+    (if (< (count split-str) length)
+      (concat split-str (repeat (- length (count split-str)) ""))
+      split-str)))

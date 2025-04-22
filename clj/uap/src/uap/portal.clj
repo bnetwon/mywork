@@ -1,6 +1,8 @@
 (ns uap.portal
   (:require [portal.api :as p]
-            [clojure.core.protocols :refer [Datafiable]]))
+            [portal.viewer :as v]
+            [clojure.core.protocols :refer [Datafiable]])
+  (:use [clojure.datafy :refer [datafy]]))
 ;; for node and jvm
 ;;(require '[portal.api :as p])
 
@@ -9,8 +11,9 @@
 ;; browser.
 ;;(require '[portal.web :as p])
 
-
+(declare portal)
 (def portal (p/open)) ; Open a new inspector
+;; (p/eval-str (slurp (clojure.java.io/resource "uap/viewer.cljs")))
 (add-tap #'p/submit) 
 
 
@@ -34,7 +37,30 @@
      :uri           (.toURI this)
      :files         (seq (.listFiles this))
      :parentname    (.getAbsolutePath (.getParentFile this))}))
-;; or with an extension installed, do:
+
+(defn file? [value] (instance? java.io.File value))
+;(require '[portal.api :as p])
+
+ ;; (def slides
+ ;; ^{::v/default :portal-present.viewer/slides}
+ ;; [^{::v/default ::v/hiccup} [:h1 "hello"]
+ ;; ^{::v/default ::/hiccup} [:h1 "world"]])
+
+(defn view-file [value]
+  (let [datavalue (datafy value)]
+    (fn [datavalue]
+      [:<> datavalue
+       ;[ins/inspector (nth (seq slides) @slide :no-slide)]
+       ;[:button {:on-click #(swap! slide dec)} "prev"]
+       ;[:button {:on-click #(swap! slide inc)} "next"]
+     ])))
+
+;; (portal.(api/register-viewer!
+;;  {:name ::file
+;;   :predicate file?
+;;   :component view-file})
+
+;; Or With an extension installed, do:
 ;;(def p (p/open {:launcher :vs-code}))  ; jvm / node only
 ;;(def p (p/open {:launcher :intellij})) ; jvm / node only
 ;;
