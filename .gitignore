@@ -6,5 +6,7 @@ clj/ctray/.nrepl-port
 clj/ctray/.gitignore
 clj/ctray/.hgignore
 clj/ctray/.lein-repl-history
-.clj-kondo/.cache/v1/java/java.awt.event.InvocationEvent.transit.json
+.clj-kondo/
+.git/
 .lsp/.cache/db.transit.json
+db.transit.json
