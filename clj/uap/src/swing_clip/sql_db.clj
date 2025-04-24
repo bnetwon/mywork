@@ -1,6 +1,7 @@
 (ns swing-clip.sql-db 
  (:require [clojure.tools.namespace.repl :as tnr]
             [java-jdbc.sql]
+            [java-time]
             [honey.sql.helpers :as h]
             [clojure.java.jdbc :as jdbc])
   )
@@ -28,7 +29,7 @@
    :subprotocol "sqlite"
    :subname     "db/sql-db.db"} )
 
-(defn gettablename [^String pstr  ]
+(defn getdbtablename [^String pstr  ]
 (let 
     [tstr  (-> (clojure.string/trim pstr)
                (clojure.string/upper-case ))]
@@ -73,7 +74,28 @@
    (h/values fv)
 )))
 
-(defn execute [tmpdb sqlst]  (jdbc/execute! tmpdb  (sql/format sqlst)))
+(defn adddatetime [record-data] (let [currtime (java-time/local-date-time)] (assoc record-data :create-datetime currtime :update-datetime currtime)))
+(defn gettablekeyword [sqlst] (let [tkeyword (if (contains? sqlst :insert-into) :insert-into :from )  ] tkeyword))
+(defn execute 
+([sqlst] (execute cdb sqlst))
+([tmpdb sqlst]  (jdbc/execute! tmpdb  (sql/format sqlst))))
+(defn query 
+  ([sqlst] (query cdb sqlst))
+  ([tmpdb sqlst]  (jdbc/query tmpdb  (sql/format sqlst))))
+
+
+;; ;; get old 3 data
+;; (def query-select (-> (helpers/select :id)
+;;                       (helpers/from :Foo)
+;;                       (helpers/order-by [:createDate :asc])
+;;                       (helpers/limit 3)))
+
+;; (def ids-to-delete (jdbc/query db-spec (sql/format query-select)))
+
+;; ;; delete data
+;; (def query-delete (-> (helpers/delete-from :Foo)
+;;                       (helpers/where [:in :id (map :id ids-to-delete)])))
+
 
 ; (jdbc/execute! cdb  (sql/format (sdb/getinsertstruct f) ))
 ; (jdbc/query sdb/cdb (sql/format (sdb/getselectall f)))

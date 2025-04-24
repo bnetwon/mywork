@@ -222,6 +222,10 @@
 (defn string-multi-split-at [ spvec chvec   ]
 ( map (fn [a] ( do (new String (byte-array a) "SJIS"))) (raw-multi-split-at spvec(.getBytes chvec "SJIS")))
   )
+(defn split-with-delimiter [s delimiter]
+  (let [parts (clojure.string/split s (re-pattern (str "(?=" delimiter ")|(?<=" delimiter ")")))]
+    (remove empty? parts)))
+
 (defn file2excel[](let [rg (re-matches #"(.*/)(.*?)$" (get-string)) dir (second rg) file (nth  rg 2) ] (set-string (str dir "\t" file ) ) ))
 
 (defn split-and-ensure-empty [s delimiter]
