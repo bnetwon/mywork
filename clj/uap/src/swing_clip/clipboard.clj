@@ -237,3 +237,75 @@
     (if (< (count split-str) length)
       (concat split-str (repeat (- length (count split-str)) ""))
       split-str)))
+
+
+(defn merge-tables [table1 table2 column1 column2]
+  (let [table2-map (into {} (map #(vector (% column2) %) table2))]
+    (for [row1 table1
+          :let [value (row1 column1)]
+          :when (contains? table2-map value)]
+      (concat row1 (table2-map value)))))
+
+(defn merge-tables-with-nil [table1 table2 column1 column2]
+  (let [headers1 (first table1)
+        headers2 (first table2)
+        table2-map (into {} (map #(vector (% column2) %) (rest table2)))
+        merged-headers (concat headers1 headers2)]
+    (cons merged-headers
+          (for [row1 (rest table1)
+                :let [key (row1 column1)
+                      row2 (get table2-map key [nil nil nil])]]
+            (concat row1 row2)))))
+
+(defn merge-maps-with-nil [list1 list2 key1 key2]
+  (let [list2-map (into {} (map #(vector (% key2) %) list2))]
+    (for [map1 list1
+          :let [key-value (map1 key1)
+                map2 (get list2-map key-value {:d nil :e nil})]]
+      (merge map1 map2))))
+
+;; 使用例
+(def list1 [{:a 1 :b "Alice" :c 30}
+            {:a 2 :b "Bob" :c 25}
+            {:a 3 :b "Charlie" :c 35}])
+
+(def list2 [{:b "Alice" :d "New York" :e "Engineer"}
+            {:b "Bob" :d "Los Angeles" :e "Designer"}
+            {:b "David" :d "Chicago" :e "Manager"}])
+
+(def result (merge-maps-with-nil list1 list2 :b :b))
+
+;; 結果を表示
+(println result)
+
+;; ;; 使用例
+;; (def table1 [["a" "b" "c"]
+;;              [1 "Alice" 30]
+;;              [2 "Bob" 25]
+;;              [3 "Charlie" 35]])
+
+;; (def table2 [["b" "d" "e"]
+;;              ["Alice" "New York" "Engineer"]
+;;              ["Bob" "Los Angeles" "Designer"]
+;;              ["David" "Chicago" "Manager"]])
+
+;; (def result (merge-tables-with-nil table1 table2 1 0))
+
+;; ;; 結果を表示
+;; (println result)
+;; ;; 使用例
+;; (def table1 [["a" "b" "c"]
+;;              [1 "Alice" 30]
+;;              [2 "Bob" 25]
+;;              [3 "Charlie" 35]])
+
+;; (def table2 [["b" "d" "e"]
+;;              ["Alice" "New York" "Engineer"]
+;;              ["Bob" "Los Angeles" "Designer"]
+;;              ["David" "Chicago" "Manager"]])
+
+;; (def result (merge-tables (rest table1) (rest table2) 1 0))
+
+;; 結果を表示
+;;(println result)
+
