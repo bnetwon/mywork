@@ -12,9 +12,9 @@
 ;;(require '[portal.web :as p])
 
 (declare portal)
-(def portal (p/open)) ; Open a new inspector
+(def portal (as-> (p/open) x (add-tap #'p/submit)  x )) ; Open a new inspector
 ;; (p/eval-str (slurp (clojure.java.io/resource "uap/viewer.cljs")))
-(add-tap #'p/submit) 
+
 
 
 ;; (require '[clojure.core.protocols :refer [Datafiable]])

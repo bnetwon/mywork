@@ -66,7 +66,51 @@
                  )
                 )
 )
-
+ (defn cmd-frame-map-chdr
+   ( [] ( cmd-frame-map-chdr {:title "cmd-frame" :encoding "SJIS" }))
+   ( [args] 
+     ( let [ aflag  (atom true)
+             cframe (seesaw.core/frame :title (:title args)  )
+             cpanel (scpanel)
+             ta     (seesaw.core/select cpanel [:#commandinput] )
+             tf     (seesaw.core/select cpanel [:#commandoutput] )
+             enter  (seesaw.core/select cpanel [:#enter] )
+             clear  (seesaw.core/select cpanel [:#clear] )
+             pb (doto (ProcessBuilder.  [] )  (.redirectErrorStream  false) (.command  ["cmd"]))
+             pi (.start pb)
+             rdr (clojure.java.io/reader (.getInputStream pi) :encoding (:encoding args))
+             _     (clojure.core.async/go-loop []
+                    (let [ch (.read rdr)]
+                      (if (not= ch -1)
+                        (do
+                            (do
+                              (.append ta  (str (char ch)))
+                              (.setCaretPosition ta (.getLength (.getDocument ta))))
+                          (recur))
+                        )))
+             wrr (clojure.java.io/writer (.getOutputStream pi ) :encoding "SJIS")
+             enter-action (seesaw.core/action :name "Enter" :handler (fn[e](do 
+                                                                                 (.write wrr (seesaw.core/config tf :text ) )   
+                                                                                 (.write wrr "\r\n" )
+                                                                                 (.flush wrr)
+                                                                                 (seesaw.core/config! tf :text "") ) ))
+             clear-action (seesaw.core/action :name "Clear" :handler (fn[e] (do 
+                                                                             (seesaw.core/config! ta :text "")  
+                                                                             (seesaw.core/config! tf :text "") 
+                                                                            ))) ]
+            (do 
+                (seesaw.core/config! ta :editable? false)
+                (seesaw.core/config! tf :action enter-action)
+                (seesaw.core/config! enter :action enter-action)
+                (seesaw.core/config! clear :action clear-action)
+                (seesaw.core/config! cframe :content cpanel) 
+                (seesaw.core/listen cframe :window-closed (fn [e] (reset! aflag false)))
+                (.setSize cframe 300 300)
+                cframe
+                )
+            )
+     )
+)
 (defn cmd-frame-map
    ( [] (cmd-frame-map {:title "cmd-frame" :encoding "SJIS" }))
    ( [args] 

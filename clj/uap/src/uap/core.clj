@@ -189,3 +189,16 @@ if ls (reset! lastFile ls) @lastFile )))
 
 
 
+(import '[java.lang.reflect Method])
+
+(defn get-methods-with-details [instance]
+  (let [methods (.getDeclaredMethods (class instance))]
+    (map (fn [method]
+           {:name (.getName method)
+            :params (map #(.getTypeName %) (.getParameterTypes method))
+            :return-type (.getTypeName (.getReturnType method))})
+         methods)))
+
+;; Žg—p—á
+(def my-instance (new java.util.ArrayList))
+(println (get-methods-with-details my-instance))
